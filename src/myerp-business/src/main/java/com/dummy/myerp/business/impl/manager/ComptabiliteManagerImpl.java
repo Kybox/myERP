@@ -1,20 +1,20 @@
 package com.dummy.myerp.business.impl.manager;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
+import com.dummy.myerp.model.bean.comptabilite.*;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.transaction.TransactionStatus;
 import com.dummy.myerp.business.contrat.manager.ComptabiliteManager;
 import com.dummy.myerp.business.impl.AbstractBusinessManager;
-import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
-import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
-import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
-import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
 import com.dummy.myerp.technical.exception.NotFoundException;
 
@@ -25,6 +25,7 @@ import com.dummy.myerp.technical.exception.NotFoundException;
 public class ComptabiliteManagerImpl extends AbstractBusinessManager implements ComptabiliteManager {
 
     // ==================== Attributs ====================
+    private Logger logger = LogManager.getLogger(this.getClass());
 
 
     // ==================== Constructeurs ====================
@@ -60,7 +61,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
      */
     // TODO à tester
     @Override
-    public synchronized void addReference(EcritureComptable pEcritureComptable) {
+    public synchronized void addReference(EcritureComptable pEcritureComptable) throws NotFoundException, FunctionalException {
         // TODO à implémenter
         // Bien se réferer à la JavaDoc de cette méthode !
         /* Le principe :
@@ -74,6 +75,29 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
                 4.  Enregistrer (insert/update) la valeur de la séquence en persitance
                     (table sequence_ecriture_comptable)
          */
+        String ecritureDate = new SimpleDateFormat("yyyy").format(pEcritureComptable.getDate());
+        logger.debug("getDate() = " + ecritureDate);
+
+        String journalCode = pEcritureComptable.getJournal().getCode();
+        logger.debug("getCode = " + journalCode);
+
+        SequenceEcritureComptable rsSequence = getDaoProxy().getComptabiliteDao()
+                .getSequenceEcritureComptable(journalCode, Integer.parseInt(ecritureDate));
+
+        Integer numeroSequence;
+        if(rsSequence != null) numeroSequence = rsSequence.getDerniereValeur() + 1;
+        else numeroSequence = 1;
+
+        String refEcriture = pEcritureComptable.getJournal().getCode()
+                + "-" + ecritureDate + "/" + String.format("%05d", numeroSequence);
+        pEcritureComptable.setReference(refEcriture);
+        updateEcritureComptable(pEcritureComptable);
+
+        SequenceEcritureComptable sequenceEcriture = new SequenceEcritureComptable();
+        sequenceEcriture.setCode(pEcritureComptable.getJournal().getCode());
+        sequenceEcriture.setAnnee(Integer.parseInt(ecritureDate));
+        sequenceEcriture.setDerniereValeur(numeroSequence);
+        mergeSequenceEcritureComptable(sequenceEcriture);
     }
 
     /**
@@ -204,6 +228,21 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
         TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
         try {
             getDaoProxy().getComptabiliteDao().deleteEcritureComptable(pId);
+            getTransactionManager().commitMyERP(vTS);
+            vTS = null;
+        } finally {
+            getTransactionManager().rollbackMyERP(vTS);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void mergeSequenceEcritureComptable(SequenceEcritureComptable pSequence){
+        TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
+        try {
+            getDaoProxy().getComptabiliteDao().mergeSequenceEcritureComptable(pSequence);
             getTransactionManager().commitMyERP(vTS);
             vTS = null;
         } finally {
