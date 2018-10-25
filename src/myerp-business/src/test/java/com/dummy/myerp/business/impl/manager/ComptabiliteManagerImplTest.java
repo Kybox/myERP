@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
@@ -14,6 +16,8 @@ import com.dummy.myerp.technical.exception.FunctionalException;
 
 
 public class ComptabiliteManagerImplTest {
+
+    private static final Logger logger = LogManager.getLogger(ComptabiliteManagerImpl.class);
 
     private EcritureComptable vEcritureComptable;
 
@@ -37,7 +41,10 @@ public class ComptabiliteManagerImplTest {
     @Test
     public void checkEcritureComptableUnit() throws Exception {
 
+        logger.debug("Method checkEcritureComptableUnit :");
+
         vEcritureComptable.setReference("AC-" + currentDate + "/00001");
+        logger.debug("Reference = " + vEcritureComptable.getReference());
 
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
                 null, new BigDecimal(123), null));
@@ -59,8 +66,10 @@ public class ComptabiliteManagerImplTest {
 
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
                 null, new BigDecimal(123), null));
+
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
                 null, null, new BigDecimal(1234)));
+
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
@@ -69,8 +78,10 @@ public class ComptabiliteManagerImplTest {
 
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
                 null, new BigDecimal(123), null));
+
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
                 null, new BigDecimal(123), null));
+
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
@@ -83,10 +94,14 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
                 null, null, new BigDecimal(123)));
 
+        logger.debug("Method checkEcritureComptableRG5 :");
+
         vEcritureComptable.setReference("DC-" + currentDate + "/00001");
+        logger.debug("Reference = " + vEcritureComptable.getReference());
 
         currentDate++;
         vEcritureComptable.setReference("AC-" + currentDate + "/00001");
+        logger.debug("Reference = " + vEcritureComptable.getReference());
 
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
