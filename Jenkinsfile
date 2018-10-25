@@ -3,7 +3,7 @@ pipeline {
   stages{
     stage('Build'){
       steps{
-        sh '/usr/share/maven/bin/mvn clean install'
+        sh '/usr/share/maven/bin/mvn -f src/pom.xml clean install'
       }
     }
   }
