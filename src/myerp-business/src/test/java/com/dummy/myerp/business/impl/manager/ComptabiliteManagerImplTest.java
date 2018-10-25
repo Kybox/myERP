@@ -16,8 +16,6 @@ import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
-
 
 public class ComptabiliteManagerImplTest extends BusinessTestCase {
 
@@ -111,7 +109,16 @@ public class ComptabiliteManagerImplTest extends BusinessTestCase {
         managerImpl.checkEcritureComptableUnit(vEcritureComptable);
     }
 
-    @Test(expected = CannotGetJdbcConnectionException.class)
+    @Test(expected = FunctionalException.class)
+    public void checkEcritureComptableRG6() throws Exception {
+
+        vEcritureComptable.setId(null);
+        vEcritureComptable.setReference("AC-2016/00001");
+
+        managerImpl.checkEcritureComptableContext(vEcritureComptable);
+    }
+
+    @Test(expected = NotFoundException.class)
     public void addReference() throws Exception {
 
         manager = getBusinessProxy().getComptabiliteManager();
