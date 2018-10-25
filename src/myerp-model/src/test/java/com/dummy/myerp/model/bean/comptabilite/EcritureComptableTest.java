@@ -2,43 +2,54 @@ package com.dummy.myerp.model.bean.comptabilite;
 
 import java.math.BigDecimal;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
-
+@RunWith(MockitoJUnitRunner.class)
 public class EcritureComptableTest {
 
-    private LigneEcritureComptable createLigne(Integer pCompteComptableNumero, String pDebit, String pCredit) {
-        BigDecimal vDebit = pDebit == null ? null : new BigDecimal(pDebit);
-        BigDecimal vCredit = pCredit == null ? null : new BigDecimal(pCredit);
-        String vLibelle = ObjectUtils.defaultIfNull(vDebit, BigDecimal.ZERO)
-                                     .subtract(ObjectUtils.defaultIfNull(vCredit, BigDecimal.ZERO)).toPlainString();
-        LigneEcritureComptable vRetour = new LigneEcritureComptable(new CompteComptable(pCompteComptableNumero),
-                                                                    vLibelle,
-                                                                    vDebit, vCredit);
-        return vRetour;
+    @Mock
+    private EcritureComptable ecritureComptable;
+
+    @Test
+    public void getTotalDebit(){
+
+        Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(BigDecimal.valueOf(123));
+        Assert.assertEquals(ecritureComptable.getTotalDebit(), BigDecimal.valueOf(123));
+    }
+
+    @Test
+    public void getTotalCredit(){
+
+        Mockito.when(ecritureComptable.getTotalCredit()).thenReturn(BigDecimal.valueOf(321));
+        Assert.assertEquals(ecritureComptable.getTotalCredit(), BigDecimal.valueOf(321));
     }
 
     @Test
     public void isEquilibree() {
-        EcritureComptable vEcriture;
-        vEcriture = new EcritureComptable();
 
-        vEcriture.setLibelle("Equilibrée");
-        vEcriture.getListLigneEcriture().add(this.createLigne(1, "200.50", null));
-        vEcriture.getListLigneEcriture().add(this.createLigne(1, "100.50", "33"));
-        vEcriture.getListLigneEcriture().add(this.createLigne(2, null, "301"));
-        vEcriture.getListLigneEcriture().add(this.createLigne(2, "40", "7"));
-        Assert.assertTrue(vEcriture.toString(), vEcriture.isEquilibree());
+        Mockito.doCallRealMethod().when(ecritureComptable).isEquilibree();
 
-        vEcriture.getListLigneEcriture().clear();
-        vEcriture.setLibelle("Non équilibrée");
-        vEcriture.getListLigneEcriture().add(this.createLigne(1, "10", null));
-        vEcriture.getListLigneEcriture().add(this.createLigne(1, "20", "1"));
-        vEcriture.getListLigneEcriture().add(this.createLigne(2, null, "30"));
-        vEcriture.getListLigneEcriture().add(this.createLigne(2, "1", "2"));
-        Assert.assertFalse(vEcriture.toString(), vEcriture.isEquilibree());
+        // Positive values : totalCredit = 100, totalDebit = 100
+        Mockito.when(ecritureComptable.getTotalCredit()).thenReturn(BigDecimal.valueOf(100));
+        Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(BigDecimal.valueOf(100));
+        Assert.assertTrue(ecritureComptable.isEquilibree());
+
+        // Positive values : totalCredit = 100, totalDebit = 10
+        Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(BigDecimal.valueOf(10));
+        Assert.assertFalse(ecritureComptable.isEquilibree());
+
+        // Negative values, : totalCredit = -100, totalDebit = -100
+        Mockito.when(ecritureComptable.getTotalCredit()).thenReturn(BigDecimal.valueOf(-100));
+        Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(BigDecimal.valueOf(-100));
+        Assert.assertTrue(ecritureComptable.isEquilibree());
+
+        // Negative values, : totalCredit = -100, totalDebit = -10
+        Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(BigDecimal.valueOf(-10));
+        Assert.assertFalse(ecritureComptable.isEquilibree());
     }
-
 }
