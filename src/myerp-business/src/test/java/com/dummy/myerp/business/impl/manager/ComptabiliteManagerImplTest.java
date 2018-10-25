@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.dummy.myerp.business.contrat.manager.ComptabiliteManager;
+import com.dummy.myerp.technical.exception.NotFoundException;
+import com.dummy.myerp.testbusiness.business.BusinessTestCase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Before;
@@ -13,15 +16,17 @@ import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
 import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
 import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
 import com.dummy.myerp.technical.exception.FunctionalException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 
-public class ComptabiliteManagerImplTest {
+public class ComptabiliteManagerImplTest extends BusinessTestCase {
 
     private static final Logger logger = LogManager.getLogger(ComptabiliteManagerImpl.class);
 
     private EcritureComptable vEcritureComptable;
 
-    private ComptabiliteManagerImpl manager;
+    private ComptabiliteManagerImpl managerImpl;
+    private ComptabiliteManager manager;
 
     private Integer currentDate;
 
@@ -33,7 +38,7 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.setDate(new Date());
         vEcritureComptable.setLibelle("Libelle");
 
-        manager = new ComptabiliteManagerImpl();
+        managerImpl = new ComptabiliteManagerImpl();
 
         currentDate = Integer.parseInt(new SimpleDateFormat("yyyy").format(new Date()));
     }
@@ -52,13 +57,13 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
                 null, null, new BigDecimal(123)));
 
-        manager.checkEcritureComptableUnit(vEcritureComptable);
+        managerImpl.checkEcritureComptableUnit(vEcritureComptable);
     }
 
     @Test(expected = FunctionalException.class)
     public void checkEcritureComptableUnitViolation() throws Exception {
 
-        manager.checkEcritureComptableUnit(vEcritureComptable);
+        managerImpl.checkEcritureComptableUnit(vEcritureComptable);
     }
 
     @Test(expected = FunctionalException.class)
@@ -70,7 +75,7 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
                 null, null, new BigDecimal(1234)));
 
-        manager.checkEcritureComptableUnit(vEcritureComptable);
+        managerImpl.checkEcritureComptableUnit(vEcritureComptable);
     }
 
     @Test(expected = FunctionalException.class)
@@ -82,7 +87,7 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
                 null, new BigDecimal(123), null));
 
-        manager.checkEcritureComptableUnit(vEcritureComptable);
+        managerImpl.checkEcritureComptableUnit(vEcritureComptable);
     }
 
     @Test(expected = FunctionalException.class)
@@ -103,7 +108,15 @@ public class ComptabiliteManagerImplTest {
         vEcritureComptable.setReference("AC-" + currentDate + "/00001");
         logger.debug("Reference = " + vEcritureComptable.getReference());
 
-        manager.checkEcritureComptableUnit(vEcritureComptable);
+        managerImpl.checkEcritureComptableUnit(vEcritureComptable);
+    }
+
+    @Test(expected = CannotGetJdbcConnectionException.class)
+    public void addReference() throws Exception {
+
+        manager = getBusinessProxy().getComptabiliteManager();
+        manager.addReference(vEcritureComptable);
+
     }
 
 }
