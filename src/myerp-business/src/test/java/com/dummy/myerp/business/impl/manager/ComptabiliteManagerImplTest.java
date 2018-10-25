@@ -74,4 +74,21 @@ public class ComptabiliteManagerImplTest {
         manager.checkEcritureComptableUnit(vEcritureComptable);
     }
 
+    @Test(expected = FunctionalException.class)
+    public void checkEcritureComptableRG5() throws Exception {
+
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(1),
+                null, new BigDecimal(123), null));
+
+        vEcritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(2),
+                null, null, new BigDecimal(123)));
+
+        vEcritureComptable.setReference("DC-" + currentDate + "/00001");
+
+        currentDate++;
+        vEcritureComptable.setReference("AC-" + currentDate + "/00001");
+
+        manager.checkEcritureComptableUnit(vEcritureComptable);
+    }
+
 }
