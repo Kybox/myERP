@@ -11,6 +11,8 @@ public class SequenceEcritureComptable {
     private Integer annee;
     /** La dernière valeur utilisée */
     private Integer derniereValeur;
+    /** Code du journal */
+    private String code;
 
     // ==================== Constructeurs ====================
     /**
@@ -44,7 +46,12 @@ public class SequenceEcritureComptable {
     public void setDerniereValeur(Integer pDerniereValeur) {
         derniereValeur = pDerniereValeur;
     }
-
+    public String getCode() {
+        return code;
+    }
+    public void setCode(String code) {
+        this.code = code;
+    }
 
     // ==================== Méthodes ====================
     @Override
@@ -54,6 +61,7 @@ public class SequenceEcritureComptable {
         vStB.append("{")
             .append("annee=").append(annee)
             .append(vSEP).append("derniereValeur=").append(derniereValeur)
+            .append(vSEP).append("code=").append(code)
             .append("}");
         return vStB.toString();
     }
