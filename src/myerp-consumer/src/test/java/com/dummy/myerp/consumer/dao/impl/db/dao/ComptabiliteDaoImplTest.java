@@ -56,13 +56,16 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     @Test
     public void getEcritureComptable() throws NotFoundException {
 
-        ecritureComptable = comptabiliteDao.getEcritureComptable(-1);
-        Assert.assertEquals(listReferences.get(0), ecritureComptable.getReference());
-
-        ecritureComptable = comptabiliteDao.getEcritureComptable(-3);
-        Assert.assertNotEquals(listReferences.get(1), ecritureComptable.getReference());
+        int id = 0;
 
         for(int i = 0; i < listReferences.size(); i++){
+
+            id--;
+            ecritureComptable = comptabiliteDao.getEcritureComptable(id);
+            Assert.assertEquals(listReferences.get(i), ecritureComptable.getReference());
+            if((i + 1) < listReferences.size())
+                Assert.assertNotEquals(listReferences.get(i + 1), ecritureComptable.getReference());
+
             ecritureComptable = comptabiliteDao.getEcritureComptableByRef(listReferences.get(i));
 
             String journalCode = ecritureComptable.getReference().substring(0,2);
