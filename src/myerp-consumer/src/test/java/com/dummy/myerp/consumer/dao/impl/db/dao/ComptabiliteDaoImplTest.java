@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,11 +23,14 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     private ComptabiliteDaoImpl comptabiliteDao;
     private EcritureComptable ecritureComptable;
     private List<String> listReferences;
+    private String currentDate;
 
     @Before
     public void setUp(){
 
         comptabiliteDao = new ComptabiliteDaoImpl();
+        ecritureComptable = new EcritureComptable();
+        currentDate = new SimpleDateFormat("yyyy").format(new Date());
 
         getReferences();
     }
@@ -75,5 +79,24 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
             String dateRef = ecritureComptable.getReference().substring(3,7);
             Assert.assertEquals(ecritureDate, dateRef);
         }
+    }
+
+    @Test
+    public void loadListLigneEcriture() throws NotFoundException {
+
+        int id = 0;
+        for(int i = 1; i <= listReferences.size(); i++){
+
+            id --;
+            ecritureComptable = comptabiliteDao.getEcritureComptable(id);
+            comptabiliteDao.loadListLigneEcriture(ecritureComptable);
+            Assert.assertTrue(ecritureComptable.getListLigneEcriture().size() > 0);
+        }
+    }
+
+    @Test
+    public void updateEcritureComptable() {
+
+
     }
 }
