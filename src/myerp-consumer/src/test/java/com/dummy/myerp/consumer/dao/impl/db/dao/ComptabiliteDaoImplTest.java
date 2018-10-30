@@ -10,7 +10,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -22,6 +24,8 @@ import java.util.List;
  * @author Kybox
  * @version 1.0
  */
+
+@FixMethodOrder(MethodSorters.JVM)
 public class ComptabiliteDaoImplTest extends ConsumerTestCase {
 
     private Logger logger = LogManager.getLogger(this.getClass());
@@ -30,6 +34,9 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     private EcritureComptable ecritureComptable;
     private List<String> listReferences;
     private String currentDate;
+    private String reference;
+    private Object result;
+    private int id;
 
     @Before
     public void setUp(){
@@ -38,8 +45,10 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
         comptabiliteDao = new ComptabiliteDaoImpl();
         ecritureComptable = new EcritureComptable();
         currentDate = new SimpleDateFormat("yyyy").format(new Date());
-
+        reference = "OD-" + currentDate + "/012345";
         getReferences();
+
+        id = (int) (Math.random() * listReferences.size());
     }
 
     private void getReferences(){
@@ -50,32 +59,47 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     }
 
     @Test
-    public void getListQueries() {
+    public void getListCompteComptable() {
 
-        List<?> list;
+        logger.info("Get list compte comptable...");
+        result = comptabiliteDao.getListCompteComptable();
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result instanceof ArrayList);
+        Assert.assertTrue(((List) result).size() > 0);
+        Assert.assertTrue(((List) result).get(id) instanceof CompteComptable);
+    }
 
-        logger.debug("Get list ecriture comptable...");
-        list = comptabiliteDao.getListEcritureComptable();
-        Assert.assertTrue(list.size() >= 5);
+    @Test
+    public void getListEcritureComptable() {
 
-        logger.debug("Get list compte comptable...");
-        list = comptabiliteDao.getListCompteComptable();
-        Assert.assertTrue(list.size() >= 7);
+        logger.info("Get list ecriture comptable...");
+        result = comptabiliteDao.getListEcritureComptable();
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result instanceof ArrayList);
+        Assert.assertTrue(((List) result).size() > 0);
+        Assert.assertTrue(((List) result).get(id) instanceof EcritureComptable);
+    }
 
-        logger.debug("Get list journal comptable...");
-        list = comptabiliteDao.getListJournalComptable();
-        Assert.assertTrue(list.size() >= 4);
+    @Test
+    public void getListJournalComptable() {
+
+        logger.info("Get list journal comptable...");
+        result = comptabiliteDao.getListJournalComptable();
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result instanceof ArrayList);
+        Assert.assertTrue(((List) result).size() > 0);
+        Assert.assertTrue(((List) result).get(id) instanceof JournalComptable);
     }
 
     @Test
     public void getEcritureComptable() throws NotFoundException {
 
-        int id = 0;
+        logger.info("Get ecriture comptable...");
 
-        logger.debug("Get ecriture comptable...");
+        id = 0;
         for(int i = 0; i < listReferences.size(); i++){
 
-            id--;
+            id --;
             ecritureComptable = comptabiliteDao.getEcritureComptable(id);
             Assert.assertEquals(listReferences.get(i), ecritureComptable.getReference());
             if((i + 1) < listReferences.size())
@@ -95,24 +119,27 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     @Test
     public void loadListLigneEcriture() throws NotFoundException {
 
-        int id = 0;
+        logger.info("Get list ligne comptable...");
 
-        logger.debug("Get list ligne comptable...");
-        for(int i = 1; i <= listReferences.size(); i++){
-
-            id --;
-            ecritureComptable = comptabiliteDao.getEcritureComptable(id);
-            comptabiliteDao.loadListLigneEcriture(ecritureComptable);
-            Assert.assertTrue(ecritureComptable.getListLigneEcriture().size() > 0);
-        }
+        id *= -1;
+        ecritureComptable = comptabiliteDao.getEcritureComptable(id);
+        comptabiliteDao.loadListLigneEcriture(ecritureComptable);
+        result = ecritureComptable.getListLigneEcriture();
+        id = (int) (Math.random() * ((List) result).size() - 1);
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result instanceof ArrayList);
+        Assert.assertTrue(((List) result).size() > 0);
+        Assert.assertTrue(((List) result).get(id) instanceof LigneEcritureComptable);
     }
 
     @Test
-    public void insertUpdateDeleteEcritureComptable() throws NotFoundException {
+    public void insertEcritureComptable() throws NotFoundException {
+
+        logger.info("Insert ecriture comptable...");
 
         ecritureComptable.setDate(new Date());
         ecritureComptable.setLibelle("Photocopieur");
-        ecritureComptable.setReference("OD-" + currentDate + "/012345");
+        ecritureComptable.setReference(reference);
         ecritureComptable.setJournal(new JournalComptable("OD", "Opérations Diverses"));
 
         ecritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(606),
@@ -121,20 +148,44 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
         ecritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(401),
                 "Facture RP011100", null, new BigDecimal(20)));
 
-        logger.debug("Insert ecriture comptable...");
         comptabiliteDao.insertEcritureComptable(ecritureComptable);
 
+        Assert.assertNotNull(comptabiliteDao.getEcritureComptableByRef(reference));
+    }
+
+    @Test
+    public void updateEcritureComptable() throws NotFoundException {
+
+        logger.info("Update ecriture comptable...");
+
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
+
+        int nbLines = ecritureComptable.getListLigneEcriture().size();
+
         ecritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(606),
-                "Format A4", new BigDecimal(21), null));
+                "Format A4", new BigDecimal(40), null));
 
         ecritureComptable.getListLigneEcriture().add(new LigneEcritureComptable(new CompteComptable(401),
-                "Facture RP011100", null, new BigDecimal(21)));
+                "Facture RP011100", null, new BigDecimal(40)));
 
-        logger.debug("Update ecriture comptable...");
         comptabiliteDao.updateEcritureComptable(ecritureComptable);
 
-        logger.debug("Delete ecriture comptable...");
-        ecritureComptable = comptabiliteDao.getEcritureComptableByRef("OD-" + currentDate + "/012345");
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
+        Assert.assertEquals(ecritureComptable.getListLigneEcriture().size(), nbLines + 2);
+    }
+
+    @Test
+    public void deleteEcritureComptable() throws NotFoundException {
+
+        logger.info("Delete ecriture comptable...");
+
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
         comptabiliteDao.deleteEcritureComptable(ecritureComptable.getId());
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void deletedEcritureComptableException() throws NotFoundException {
+
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
     }
 }
