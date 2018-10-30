@@ -1,9 +1,6 @@
 package com.dummy.myerp.consumer.dao.impl.db.dao;
 
-import com.dummy.myerp.model.bean.comptabilite.CompteComptable;
-import com.dummy.myerp.model.bean.comptabilite.EcritureComptable;
-import com.dummy.myerp.model.bean.comptabilite.JournalComptable;
-import com.dummy.myerp.model.bean.comptabilite.LigneEcritureComptable;
+import com.dummy.myerp.model.bean.comptabilite.*;
 import com.dummy.myerp.technical.exception.NotFoundException;
 import com.dummy.myerp.testconsumer.consumer.ConsumerTestCase;
 import org.apache.logging.log4j.LogManager;
@@ -175,6 +172,16 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     }
 
     @Test
+    public void deleteListLigneEcritureComptable() throws NotFoundException {
+
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
+        comptabiliteDao.deleteListLigneEcritureComptable(ecritureComptable.getId());
+        ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
+
+        Assert.assertEquals(0, ecritureComptable.getListLigneEcriture().size());
+    }
+
+    @Test
     public void deleteEcritureComptable() throws NotFoundException {
 
         logger.info("Delete ecriture comptable...");
@@ -187,5 +194,43 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
     public void deletedEcritureComptableException() throws NotFoundException {
 
         ecritureComptable = comptabiliteDao.getEcritureComptableByRef(reference);
+    }
+
+    @Test
+    public void getSequenceEcritureComptable() throws NotFoundException {
+
+        ecritureComptable = comptabiliteDao.getEcritureComptable(-1);
+
+        String journalCode = ecritureComptable.getJournal().getCode();
+        Integer annee = Integer.valueOf(new SimpleDateFormat("yyyy").format(ecritureComptable.getDate()));
+
+        SequenceEcritureComptable sequence = comptabiliteDao.getSequenceEcritureComptable(journalCode, annee);
+
+        Assert.assertNotNull(sequence);
+        Assert.assertEquals(journalCode, sequence.getCode());
+        Assert.assertEquals(annee, sequence.getAnnee());
+    }
+
+    @Test
+    public void upsertSequenceEcritureComptable() throws NotFoundException {
+
+        ecritureComptable = comptabiliteDao.getEcritureComptable(-1);
+        Integer newValue = 999;
+        Integer lastValue;
+
+
+        String journalCode = ecritureComptable.getJournal().getCode();
+        Integer annee = Integer.valueOf(new SimpleDateFormat("yyyy").format(ecritureComptable.getDate()));
+        SequenceEcritureComptable sequence = comptabiliteDao.getSequenceEcritureComptable(journalCode, annee);
+
+        lastValue = sequence.getDerniereValeur();
+        sequence.setDerniereValeur(newValue);
+        comptabiliteDao.upsertSequenceEcritureComptable(sequence);
+
+        sequence = comptabiliteDao.getSequenceEcritureComptable(journalCode, annee);
+        Assert.assertEquals(newValue, sequence.getDerniereValeur());
+
+        sequence.setDerniereValeur(lastValue);
+        comptabiliteDao.upsertSequenceEcritureComptable(sequence);
     }
 }
