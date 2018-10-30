@@ -71,8 +71,8 @@ public class CompteComptable {
         final StringBuilder vStB = new StringBuilder(this.getClass().getSimpleName());
         final String vSEP = ", ";
         vStB.append("{")
-            .append("numero=").append(numero)
-            .append(vSEP).append("libelle='").append(libelle).append('\'')
+            .append("numero=").append(getNumero())
+            .append(vSEP).append("libelle='").append(getLibelle()).append('\'')
             .append("}");
         return vStB.toString();
     }

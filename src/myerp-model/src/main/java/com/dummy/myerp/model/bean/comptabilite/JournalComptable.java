@@ -63,8 +63,8 @@ public class JournalComptable {
         final StringBuilder vStB = new StringBuilder(this.getClass().getSimpleName());
         final String vSEP = ", ";
         vStB.append("{")
-            .append("code='").append(code).append('\'')
-            .append(vSEP).append("libelle='").append(libelle).append('\'')
+            .append("code='").append(getCode()).append('\'')
+            .append(vSEP).append("libelle='").append(getLibelle()).append('\'')
             .append("}");
         return vStB.toString();
     }

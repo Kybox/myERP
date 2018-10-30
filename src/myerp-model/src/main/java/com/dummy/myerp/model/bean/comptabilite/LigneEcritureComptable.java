@@ -87,10 +87,10 @@ public class LigneEcritureComptable {
         final StringBuilder vStB = new StringBuilder(this.getClass().getSimpleName());
         final String vSEP = ", ";
         vStB.append("{")
-            .append("compteComptable=").append(compteComptable)
-            .append(vSEP).append("libelle='").append(libelle).append('\'')
-            .append(vSEP).append("debit=").append(debit)
-            .append(vSEP).append("credit=").append(credit)
+            .append("compteComptable=").append(getCompteComptable())
+            .append(vSEP).append("libelle='").append(getLibelle()).append('\'')
+            .append(vSEP).append("debit=").append(getDebit())
+            .append(vSEP).append("credit=").append(getCredit())
             .append("}");
         return vStB.toString();
     }
