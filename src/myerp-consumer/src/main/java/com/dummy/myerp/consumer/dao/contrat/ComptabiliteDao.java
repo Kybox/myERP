@@ -95,5 +95,5 @@ public interface ComptabiliteDao {
      * Ajoute ou met à jour la séquence d'écriture comptable
      * @param pSequence La séquence d'écriture comptable
      */
-    void mergeSequenceEcritureComptable(SequenceEcritureComptable pSequence);
+    void upsertSequenceEcritureComptable(SequenceEcritureComptable pSequence);
 }

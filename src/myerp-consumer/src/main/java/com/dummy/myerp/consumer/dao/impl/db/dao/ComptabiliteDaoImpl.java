@@ -284,18 +284,18 @@ public class ComptabiliteDaoImpl extends AbstractDbConsumer implements Comptabil
         }
     }
 
-    /** SQLmergeSequenceEcritureComptable */
-    private static String SQLmergeSequenceEcritureComptable;
-    public void setSQLmergeSequenceEcritureComptable(String pSQLmergeSequenceEcritureComptable) {
-        SQLmergeSequenceEcritureComptable = pSQLmergeSequenceEcritureComptable;
+    /** SQLupsertSequenceEcritureComptable */
+    private static String SQLupsertSequenceEcritureComptable;
+    public void setSQLupsertSequenceEcritureComptable(String pSQLupsertSequenceEcritureComptable) {
+        SQLupsertSequenceEcritureComptable = pSQLupsertSequenceEcritureComptable;
     }
     @Override
-    public void mergeSequenceEcritureComptable(SequenceEcritureComptable pSequence){
+    public void upsertSequenceEcritureComptable(SequenceEcritureComptable pSequence){
         NamedParameterJdbcTemplate vJdbcTemplate = new NamedParameterJdbcTemplate(getDataSource(DataSourcesEnum.MYERP));
         MapSqlParameterSource vSqlParams = new MapSqlParameterSource();
         vSqlParams.addValue("journal_code", pSequence.getCode());
         vSqlParams.addValue("annee", pSequence.getAnnee());
         vSqlParams.addValue("derniere_valeur", pSequence.getDerniereValeur());
-        vJdbcTemplate.update(SQLmergeSequenceEcritureComptable, vSqlParams);
+        vJdbcTemplate.update(SQLupsertSequenceEcritureComptable, vSqlParams);
     }
 }

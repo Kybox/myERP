@@ -252,7 +252,7 @@ public class ComptabiliteManagerImpl extends AbstractBusinessManager implements 
     public void mergeSequenceEcritureComptable(SequenceEcritureComptable pSequence){
         TransactionStatus vTS = getTransactionManager().beginTransactionMyERP();
         try {
-            getDaoProxy().getComptabiliteDao().mergeSequenceEcritureComptable(pSequence);
+            getDaoProxy().getComptabiliteDao().upsertSequenceEcritureComptable(pSequence);
             getTransactionManager().commitMyERP(vTS);
             vTS = null;
         } finally {
