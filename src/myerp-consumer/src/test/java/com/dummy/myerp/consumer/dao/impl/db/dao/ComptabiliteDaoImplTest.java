@@ -119,6 +119,7 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
         logger.info("Get list ligne comptable...");
 
         id *= -1;
+        if(id == 0) id = -1;
         ecritureComptable = comptabiliteDao.getEcritureComptable(id);
         comptabiliteDao.loadListLigneEcriture(ecritureComptable);
         result = ecritureComptable.getListLigneEcriture();
