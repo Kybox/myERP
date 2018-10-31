@@ -1,12 +1,9 @@
 package com.dummy.myerp.model.bean.comptabilite;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.sun.org.apache.regexp.internal.RE;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +23,6 @@ public class EcritureComptableTest {
     private final String REF = "ZZ-9876/54321";
     private final Date DATE = new Date();
     private final String LIB = "Test";
-    private List<LigneEcritureComptable> list;
     private final BigDecimal TOTDEB = new BigDecimal(123);
     private final BigDecimal TOTCRE = new BigDecimal(321);
 
@@ -38,7 +34,7 @@ public class EcritureComptableTest {
         Mockito.when(ecritureComptable.getReference()).thenReturn(REF);
         Mockito.when(ecritureComptable.getDate()).thenReturn(DATE);
         Mockito.when(ecritureComptable.getLibelle()).thenReturn(LIB);
-        Mockito.when(ecritureComptable.getListLigneEcriture()).thenReturn(list);
+        Mockito.when(ecritureComptable.getListLigneEcriture()).thenReturn(null);
         Mockito.when(ecritureComptable.getTotalCredit()).thenReturn(TOTCRE);
         Mockito.when(ecritureComptable.getTotalDebit()).thenReturn(TOTDEB);
         Mockito.doCallRealMethod().when(ecritureComptable).toString();
