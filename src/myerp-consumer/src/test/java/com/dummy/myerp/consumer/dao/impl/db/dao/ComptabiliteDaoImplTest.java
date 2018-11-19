@@ -85,7 +85,7 @@ public class ComptabiliteDaoImplTest extends ConsumerTestCase {
         Assert.assertNotNull(result);
         Assert.assertTrue(result instanceof ArrayList);
         Assert.assertTrue(((List) result).size() > 0);
-        Assert.assertTrue(((List) result).get(id) instanceof JournalComptable);
+        Assert.assertTrue(((List) result).get(1) instanceof JournalComptable);
     }
 
     @Test
